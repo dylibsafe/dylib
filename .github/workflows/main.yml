@@ -1,0 +1,32 @@
+name: Build Dylib
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Theos
+        uses: Randomblock1/theos-action@v1
+        with:
+          theos-sdks: 'https://github.com/theos/sdks'
+
+      - name: Build Tweak
+        run: |
+          make clean
+          make
+
+      - name: Upload Dylib Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tweak-dylib
+          # Theos derleme sonrası .dylib dosyasını genellikle .theos/obj/debug/ veya .theos/obj/ altına çıkarır.
+          # Gerekirse yolu kendi projene göre kontrol et.
+          path: .theos/obj/**/*.dylib
